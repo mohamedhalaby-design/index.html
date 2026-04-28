@@ -1,43 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Live Attendance Dashboard</title>
-  <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background: #f4f4f4;
-    }
-  </style>
-</head>
-
-<body>
-
-<h2>📊 Live Attendance Dashboard</h2>
-
-<table id="sheetTable"></table>
-
-<script>
-
-const apiURL = "https://script.google.com/macros/s/AKfycbxJYmc4L32APuiBRoTMGU7mlWmDd2O6JhiP8eq4eg_R3KhpXRVM7b0s-nruxHitildk_Q/exec";
-
 fetch(apiURL)
   .then(res => res.json())
   .then(data => {
     const table = document.getElementById("sheetTable");
-
     table.innerHTML = "";
 
     if (!data || data.length === 0) {
@@ -70,12 +34,7 @@ fetch(apiURL)
     });
   })
   .catch(err => {
-    console.log(err);
+    console.log("ERROR:", err);
     document.getElementById("sheetTable").innerHTML =
       "<tr><td>Error loading data</td></tr>";
   });
-
-</script>
-
-</body>
-</html>
