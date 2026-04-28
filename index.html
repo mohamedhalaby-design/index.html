@@ -1,15 +1,30 @@
-fetch(apiURL)
-  .then(res => res.json())
-  .then(data => {
-    const table = document.getElementById("sheetTable");
-    table.innerHTML = "";
+<script>
+console.log("SCRIPT LOADED");
 
-    if (!data || data.length === 0) {
-      table.innerHTML = "<tr><td>No data found</td></tr>";
+const apiURL = "https://script.google.com/macros/s/AKfycbxJYmc4L32APuiBRoTMGU7mlWmDd2O6JhiP8eq4eg_R3KhpXRVM7b0s-nruxHitildk_Q/exec";
+
+fetch(apiURL)
+  .then(res => {
+    console.log("FETCH OK", res);
+    return res.json();
+  })
+  .then(data => {
+    console.log("DATA RECEIVED:", data);
+
+    const table = document.getElementById("sheetTable");
+
+    if (!table) {
+      console.log("TABLE NOT FOUND");
       return;
     }
 
-    // headers
+    table.innerHTML = "";
+
+    if (!data || data.length === 0) {
+      table.innerHTML = "<tr><td>No data</td></tr>";
+      return;
+    }
+
     const headers = Object.keys(data[0]);
 
     let headerRow = document.createElement("tr");
@@ -20,21 +35,21 @@ fetch(apiURL)
     });
     table.appendChild(headerRow);
 
-    // rows
     data.forEach(row => {
       let tr = document.createElement("tr");
 
       headers.forEach(h => {
         let td = document.createElement("td");
-        td.textContent = row[h] ?? "";
+        td.textContent = row[h];
         tr.appendChild(td);
       });
 
       table.appendChild(tr);
     });
+
   })
   .catch(err => {
-    console.log("ERROR:", err);
-    document.getElementById("sheetTable").innerHTML =
-      "<tr><td>Error loading data</td></tr>";
+    console.error("FETCH ERROR:", err);
+    document.body.innerHTML = "<h3>Error loading dashboard (check console)</h3>";
   });
+</script>
