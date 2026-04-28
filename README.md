@@ -1,33 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Attendance Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #f4f4f4;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>📊 Live Attendance Dashboard</h2>
+
+<table id="sheetTable"></table>
+
 <script>
-const sheetID = "1JAhpJhrqixjnEsRsdGXIueNxgNSST2a26EpXcRVwWf4";
-const sheetName = "live Attendance DB";
 
-// مهم: نحولها Range صح
-const range = encodeURIComponent(`'${sheetName}'`);
+const apiURL = "https://script.google.com/macros/s/AKfycbxJYmc4L32APuiBRoTMGU7mlWmDd2O6JhiP8eq4eg_R3KhpXRVM7b0s-nruxHitildk_Q/exec";
 
-const apiKey = "YOUR_API_KEY";
-
-const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
-
-fetch(url)
+fetch(apiURL)
   .then(res => res.json())
   .then(data => {
     const table = document.getElementById("sheetTable");
-    const rows = data.values;
 
-    if (!rows) {
+    table.innerHTML = "";
+
+    if (!data || data.length === 0) {
       table.innerHTML = "<tr><td>No data found</td></tr>";
       return;
     }
 
-    table.innerHTML = "";
+    // headers
+    const headers = Object.keys(data[0]);
 
-    rows.forEach((row, i) => {
+    let headerRow = document.createElement("tr");
+    headers.forEach(h => {
+      let th = document.createElement("th");
+      th.textContent = h;
+      headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // rows
+    data.forEach(row => {
       let tr = document.createElement("tr");
 
-      row.forEach(cell => {
-        let td = document.createElement(i === 0 ? "th" : "td");
-        td.textContent = cell || "";
+      headers.forEach(h => {
+        let td = document.createElement("td");
+        td.textContent = row[h] ?? "";
         tr.appendChild(td);
       });
 
@@ -39,4 +74,8 @@ fetch(url)
     document.getElementById("sheetTable").innerHTML =
       "<tr><td>Error loading data</td></tr>";
   });
+
 </script>
+
+</body>
+</html>
