@@ -1,55 +1,39 @@
 <script>
-console.log("SCRIPT LOADED");
+// ─── API CONFIG ─────────────────────────────────────────────────────────────
+const API_URL = "https://script.google.com/macros/s/AKfycbxJYmc4L32APuiBRoTMGU7mlWmDd2O6JhiP8eq4eg_R3KhpXRVM7b0s-nruxHitildk_Q/exec";
 
-const apiURL = "https://script.google.com/macros/s/AKfycbxJYmc4L32APuiBRoTMGU7mlWmDd2O6JhiP8eq4eg_R3KhpXRVM7b0s-nruxHitildk_Q/exec";
+let ALL_ROWS = [];
+let filtered = [];
 
-fetch(apiURL)
-  .then(res => {
-    console.log("FETCH OK", res);
-    return res.json();
-  })
+// ─── LOAD DATA FIRST ─────────────────────────────────────────────────────────
+fetch(API_URL)
+  .then(res => res.json())
   .then(data => {
-    console.log("DATA RECEIVED:", data);
 
-    const table = document.getElementById("sheetTable");
+    // normalize data عشان الداشبورد يفهمه
+    ALL_ROWS = data.map(r => ({
+      id: r.id || r.ID || "",
+      name: r.name || r.Name || "",
+      shift: r.shift || r.Shift || "",
+      status: r.status || r.Status || "",
+      week: Number(r.week || r.Week || 0),
+      month: Number(r.month || r.Month || 0),
 
-    if (!table) {
-      console.log("TABLE NOT FOUND");
-      return;
-    }
+      // مهم للـ KPI calculations
+      isWork: !["WO","OFF","PH","OFFDAY"].includes(r.status)
+    }));
 
-    table.innerHTML = "";
+    filtered = ALL_ROWS;
 
-    if (!data || data.length === 0) {
-      table.innerHTML = "<tr><td>No data</td></tr>";
-      return;
-    }
-
-    const headers = Object.keys(data[0]);
-
-    let headerRow = document.createElement("tr");
-    headers.forEach(h => {
-      let th = document.createElement("th");
-      th.textContent = h;
-      headerRow.appendChild(th);
-    });
-    table.appendChild(headerRow);
-
-    data.forEach(row => {
-      let tr = document.createElement("tr");
-
-      headers.forEach(h => {
-        let td = document.createElement("td");
-        td.textContent = row[h];
-        tr.appendChild(td);
-      });
-
-      table.appendChild(tr);
-    });
+    // تشغيل الداشبورد بعد تحميل البيانات
+    initCharts();
+    updateAll();
 
   })
   .catch(err => {
-    console.error("FETCH ERROR:", err);
-    document.body.innerHTML = "<h3>Error loading dashboard (check console)</h3>";
+    console.log("API ERROR:", err);
+    document.body.innerHTML =
+      "<h2 style='color:red;text-align:center;margin-top:50px'>❌ Failed to load data from API</h2>";
   });
+
 </script>
